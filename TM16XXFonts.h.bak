@@ -163,13 +163,4 @@ const byte FONT_DEFAULT[] = {
   0b00000001, // (126)	~
 };
 
-
-//THK New FONTS
-const byte Font_Clear_DATA[] = {
-  0b00000000, // Clear
-  0b00110000, // | left
-  0b00000110, // | right
-};
-
-
 #endif

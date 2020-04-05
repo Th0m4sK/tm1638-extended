@@ -17,97 +17,121 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #if defined(ARDUINO) && ARDUINO >= 100
-	#include "Arduino.h"
+#include "Arduino.h"
 #else
-	#include "WProgram.h"
+#include "WProgram.h"
 #endif
 
 #include "TM1638.h"
 #include "string.h"
 
 TM1638::TM1638(byte dataPin, byte clockPin, byte strobePin, boolean activateDisplay, byte intensity)
-	: TM16XX(dataPin, clockPin, strobePin, 8, activateDisplay, intensity)
+    : TM16XX(dataPin, clockPin, strobePin, 8, activateDisplay, intensity)
 {
-	// nothing else to do - calling super is enough
+  // nothing else to do - calling super is enough
 }
 
 void TM1638::setDisplayToHexNumber(unsigned long number, byte dots, boolean leadingZeros,
-	const byte numberFont[])
+                                   const byte numberFont[])
 {
-  for (int i = 0; i < displays; i++) {
-	if (!leadingZeros && number == 0) {
-		clearDisplayDigit(displays - i - 1, (dots & (1 << i)) != 0);
-	} else {
-		setDisplayDigit(number & 0xF, displays - i - 1, (dots & (1 << i)) != 0, numberFont);
-		number >>= 4;
+  for (int i = 0; i < displays; i++)
+  {
+    if (!leadingZeros && number == 0)
+    {
+      clearDisplayDigit(displays - i - 1, (dots & (1 << i)) != 0);
+    }
+    else
+    {
+      setDisplayDigit(number & 0xF, displays - i - 1, (dots & (1 << i)) != 0, numberFont);
+      number >>= 4;
     }
   }
 }
 
 void TM1638::setDisplayToDecNumberAt(unsigned long number, byte dots, byte startingPos, boolean leadingZeros,
-	const byte numberFont[])
+                                     const byte numberFont[])
 {
-  if (number > 99999999L) {
+  if (number > 99999999L)
+  {
     setDisplayToError();
-  } else {
-    for (int i = 0; i < displays - startingPos; i++) {
-      if (number != 0) {
+  }
+  else
+  {
+    for (int i = 0; i < displays - startingPos; i++)
+    {
+      if (number != 0)
+      {
         setDisplayDigit(number % 10, displays - i - 1, (dots & (1 << i)) != 0, numberFont);
         number /= 10;
-      } else {
-		if (leadingZeros) {
-		  setDisplayDigit(0, displays - i - 1, (dots & (1 << i)) != 0, numberFont);
-		} else {
-		  clearDisplayDigit(displays - i - 1, (dots & (1 << i)) != 0);
-		}
+      }
+      else
+      {
+        if (leadingZeros)
+        {
+          setDisplayDigit(0, displays - i - 1, (dots & (1 << i)) != 0, numberFont);
+        }
+        else
+        {
+          clearDisplayDigit(displays - i - 1, (dots & (1 << i)) != 0);
+        }
       }
     }
   }
 }
 
 void TM1638::setDisplayToDecNumber(unsigned long number, byte dots, boolean leadingZeros,
-	const byte numberFont[])
+                                   const byte numberFont[])
 {
-	setDisplayToDecNumberAt(number, dots, 0, leadingZeros, numberFont);
+  setDisplayToDecNumberAt(number, dots, 0, leadingZeros, numberFont);
 }
 
 void TM1638::setDisplayToSignedDecNumber(signed long number, byte dots, boolean leadingZeros,
-		const byte numberFont[])
+                                         const byte numberFont[])
 {
-	if (number >= 0) {
-		setDisplayToDecNumberAt(number, dots, 0, leadingZeros, numberFont);
-	} else {
-		if (-number > 9999999L) {
-		    setDisplayToError();
-		} else {
-			setDisplayToDecNumberAt(-number, dots, 1, leadingZeros, numberFont);
-			sendChar(0, MINUS, (dots & (0x80)) != 0);
-		}
-	}
+  if (number >= 0)
+  {
+    setDisplayToDecNumberAt(number, dots, 0, leadingZeros, numberFont);
+  }
+  else
+  {
+    if (-number > 9999999L)
+    {
+      setDisplayToError();
+    }
+    else
+    {
+      setDisplayToDecNumberAt(-number, dots, 1, leadingZeros, numberFont);
+      sendChar(0, MINUS, (dots & (0x80)) != 0);
+    }
+  }
 }
 
 void TM1638::setDisplayToBinNumber(byte number, byte dots, const byte numberFont[])
 {
-  for (int i = 0; i < displays; i++) {
+  for (int i = 0; i < displays; i++)
+  {
     setDisplayDigit((number & (1 << i)) == 0 ? 0 : 1, displays - i - 1, (dots & (1 << i)) != 0, numberFont);
   }
 }
 
 void TM1638::setLED(byte color, byte pos)
 {
-    sendData((pos << 1) + 1, color);
+  sendData((pos << 1) + 1, color);
 }
 
 void TM1638::setLEDs(word leds)
 {
-  for (int i = 0; i < displays; i++) {
+  for (int i = 0; i < displays; i++)
+  {
     byte color = 0;
 
-    if ((leds & (1 << i)) != 0) {
+    if ((leds & (1 << i)) != 0)
+    {
       color |= TM1638_COLOR_RED;
     }
 
-    if ((leds & (1 << (i + 8))) != 0) {
+    if ((leds & (1 << (i + 8))) != 0)
+    {
       color |= TM1638_COLOR_GREEN;
     }
 
@@ -121,7 +145,8 @@ byte TM1638::getButtons(void)
 
   digitalWrite(strobePin, LOW);
   send(0x42);
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 4; i++)
+  {
     keys |= receive() << i;
   }
   digitalWrite(strobePin, HIGH);
@@ -131,5 +156,104 @@ byte TM1638::getButtons(void)
 
 void TM1638::sendChar(byte pos, byte data, boolean dot)
 {
-	sendData(pos << 1, data | (dot ? 0b10000000 : 0));
+  sendData(pos << 1, data | (dot ? 0b10000000 : 0));
+}
+
+//**********************************************
+//Neuer Code THK
+//**********************************************
+
+void TM1638::setDIGITFromTO(byte from, byte to, byte Zeichen, boolean dot, const byte font[])
+{
+  if (((from > 7) | (to > 7)) | (from > to)) //|(Zeichen > sizeof(font))
+  {
+
+    return;
+  }
+
+  for (int i = from; i < to + 1; i++)
+  {
+    setDisplayDigit(Zeichen, i, dot, font);
+  }
+}
+
+void TM1638::ErrorBlink(byte Anzahl, uint16_t Zeit)
+{
+  for (int i = 0; i < Anzahl; i++)
+  {
+    setDisplayToError();
+    delay(Zeit);
+    clearDisplay();
+    delay(Zeit);
+  }
+}
+
+void TM1638::ClearDisplayVertical(clear_direction_enum dir, unsigned long SpeedDelay)
+{ int i1=0;
+  switch (dir)
+
+  {
+  case Left2Right:
+    for (int i = 0; i < 8; i++)
+    {
+      setDisplayDigit(1, i, false, Font_Clear_DATA );
+      delay(SpeedDelay);
+      setDisplayDigit(2, i, false, Font_Clear_DATA);
+      delay(SpeedDelay);
+      setDisplayDigit(0, i, false, Font_Clear_DATA);
+      delay(SpeedDelay);
+    }
+    break;
+
+     case Right2Left:
+    for (int i =8 ; i > 0; i--)
+    {
+      setDisplayDigit(2, i-1, false, Font_Clear_DATA);
+      delay(SpeedDelay);
+      setDisplayDigit(1, i-1, false, Font_Clear_DATA);
+      delay(SpeedDelay);
+      setDisplayDigit(0, i-1, false, Font_Clear_DATA);
+      delay(SpeedDelay);
+    }
+    break;
+     case Middle2End:
+     i1 = 3;
+     SpeedDelay*=2;
+    for (int i = 4; i < 8; i++)
+    {
+      setDisplayDigit(1, i, false, Font_Clear_DATA);
+      setDisplayDigit(2, i1, false, Font_Clear_DATA);
+      delay(SpeedDelay);
+      setDisplayDigit(2, i, false, Font_Clear_DATA);
+       setDisplayDigit(1, i1, false, Font_Clear_DATA);
+      delay(SpeedDelay);
+      setDisplayDigit(0, i, false, Font_Clear_DATA);
+       setDisplayDigit(0, i1, false, Font_Clear_DATA);
+      delay(SpeedDelay);
+      i1--;
+    }
+    break;
+
+ case End2Middle:
+    i1 = 7;
+    SpeedDelay*=2;
+    for (int i = 0; i < 4; i++)
+    {
+      setDisplayDigit(1, i, false, Font_Clear_DATA);
+      setDisplayDigit(2, i1, false, Font_Clear_DATA);
+      delay(SpeedDelay);
+      setDisplayDigit(2, i, false, Font_Clear_DATA);
+       setDisplayDigit(1, i1, false, Font_Clear_DATA);
+      delay(SpeedDelay);
+      setDisplayDigit(0, i, false, Font_Clear_DATA);
+       setDisplayDigit(0, i1, false, Font_Clear_DATA);
+      delay(SpeedDelay);
+      i1--;
+    }
+    break;
+
+
+  default:
+    break;
+  }
 }

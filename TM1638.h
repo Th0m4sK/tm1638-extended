@@ -20,49 +20,64 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define TM1638_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
-	#include "Arduino.h"
+#include "Arduino.h"
 #else
-	#include "WProgram.h"
+//#include "WProgram.h"
 #endif
 
 #include "TM16XX.h"
 #include "TM16XXFonts.h"
 
-#define TM1638_COLOR_NONE   0
-#define TM1638_COLOR_RED    1
-#define TM1638_COLOR_GREEN  2
+#define TM1638_COLOR_NONE 0
+#define TM1638_COLOR_RED 1
+#define TM1638_COLOR_GREEN 2
+
+typedef enum {
+  Left2Right = 0,
+  Right2Left = 1,
+  Middle2End = 2,
+  End2Middle = 3
+
+} clear_direction_enum;
 
 class TM1638 : public TM16XX
 {
-  public:
-    /** Instantiate a tm1638 module specifying the display state, the starting intensity (0-7) data, clock and stobe pins. */
-    TM1638(byte dataPin, byte clockPin, byte strobePin, boolean activateDisplay = true, byte intensity = 7);
+public:
+  /** Instantiate a tm1638 module specifying the display state, the starting intensity (0-7) data, clock and stobe pins. */
+  TM1638(byte dataPin, byte clockPin, byte strobePin, boolean activateDisplay = true, byte intensity = 7);
 
-    /** Set the display to a unsigned hexadecimal number (with or without leading zeros) */
-    void setDisplayToHexNumber(unsigned long number, byte dots, boolean leadingZeros = true,
-		const byte numberFont[] = NUMBER_FONT);
-    /** Set the display to a unsigned decimal number (with or without leading zeros) */
-    void setDisplayToDecNumber(unsigned long number, byte dots, boolean leadingZeros = true,
-		const byte numberFont[] = NUMBER_FONT);
-    /** Set the display to a signed decimal number (with or without leading zeros) */
-    void setDisplayToSignedDecNumber(signed long number, byte dots, boolean leadingZeros = true,
-		const byte numberFont[] = NUMBER_FONT);
-    /** Set the display to a unsigned binary number */
-    void setDisplayToBinNumber(byte number, byte dots,
-		const byte numberFont[] = NUMBER_FONT);
+  /** Set the display to a unsigned hexadecimal number (with or without leading zeros) */
+  void setDisplayToHexNumber(unsigned long number, byte dots, boolean leadingZeros = true,
+                             const byte numberFont[] = NUMBER_FONT);
+  /** Set the display to a unsigned decimal number (with or without leading zeros) */
+  void setDisplayToDecNumber(unsigned long number, byte dots, boolean leadingZeros = true,
+                             const byte numberFont[] = NUMBER_FONT);
+  /** Set the display to a signed decimal number (with or without leading zeros) */
+  void setDisplayToSignedDecNumber(signed long number, byte dots, boolean leadingZeros = true,
+                                   const byte numberFont[] = NUMBER_FONT);
+  /** Set the display to a unsigned binary number */
+  void setDisplayToBinNumber(byte number, byte dots,
+                             const byte numberFont[] = NUMBER_FONT);
 
-    /** Set the LED at pos to color (TM1638_COLOR_RED, TM1638_COLOR_GREEN or both) */
-    virtual void setLED(byte color, byte pos);
-    /** Set the LEDs. MSB byte for the green LEDs, LSB for the red LEDs */
-    void setLEDs(word led);
+  //NEU THK
 
-    /** Returns the pressed buttons as a bit set (left to right). */
-    virtual byte getButtons();
+  void ClearDisplayVertical(clear_direction_enum Orentierung, unsigned long Speed=30);
 
-  protected:
-    virtual void sendChar(byte pos, byte data, boolean dot);
-    void setDisplayToDecNumberAt(unsigned long number, byte dots, byte startingPos,
-    	boolean leadingZeros, const byte numberFont[]);
+  void setDIGITFromTO(byte from, byte to, byte Zeichen, boolean dot, const byte font[]);
+  void ErrorBlink(byte Anzahl, uint16_t Zeit);
+
+  /** Set the LED at pos to color (TM1638_COLOR_RED, TM1638_COLOR_GREEN or both) */
+  virtual void setLED(byte color, byte pos);
+  /** Set the LEDs. MSB byte for the green LEDs, LSB for the red LEDs */
+  void setLEDs(word led);
+
+  /** Returns the pressed buttons as a bit set (left to right). */
+  virtual byte getButtons();
+
+protected:
+  virtual void sendChar(byte pos, byte data, boolean dot);
+  void setDisplayToDecNumberAt(unsigned long number, byte dots, byte startingPos,
+                               boolean leadingZeros, const byte numberFont[]);
 };
 
 #endif

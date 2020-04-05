@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #if defined(ARDUINO) && ARDUINO >= 100
 	#include "Arduino.h"
 #else
-	//#include "WProgram.h"
+	#include "WProgram.h"
 #endif
 
 #include "TM1638QYF.h"
@@ -31,7 +31,7 @@ TM1638QYF::TM1638QYF(byte dataPin, byte clockPin, byte strobePin, boolean activa
 	// nothing else to do - calling super is enough
 }
 
-void TM1638QYF::setDisplay(const byte values[], int length)
+void TM1638QYF::setDisplay(const byte values[], unsigned int length)
 {
   for (int i = 0; i < displays; i++) {
 	int val = 0;
@@ -104,7 +104,7 @@ void TM1638QYF::setDisplayToHexNumber(unsigned long number, byte dots, boolean l
 {
 	char values[displays + 1];
 
-	snprintf(values, displays + 1, leadingZeros ? "%08lX" : "%lX", number); // ignores display size
+	snprintf(values, displays + 1, leadingZeros ? "%08X" : "%X", number); // ignores display size
 
 	setDisplayToString(values, dots, 0, numberFont);
 }
@@ -126,7 +126,7 @@ void TM1638QYF::setDisplayToSignedDecNumber(signed long number, byte dots, boole
 {
 	char values[displays + 1];
 
-	snprintf(values, displays + 1, leadingZeros ? "%08ld" : "%ld", number); // ignores display size
+	snprintf(values, displays + 1, leadingZeros ? "%08d" : "%d", number); // ignores display size
 
 	setDisplayToString(values, dots, 0, numberFont);
 }
