@@ -1,3 +1,9 @@
+Version 2.3.0
+
+- Bugfixing
+- New Fuctions clear Animations
+
+
 Version 2.2.0
 
 - Support for common anode TM1638 module (QYF-TM1638);
