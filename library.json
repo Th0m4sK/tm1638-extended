@@ -5,7 +5,7 @@
   "description": "A library for interacting an arduino with a TM1638/TM1640   Fork from TM1638 (Ricardo Batista) More functions",
   "authors":
     [{
-      "name": "Th0masK",
+      "name": "Th0m4sK",
       "email": "Thomas@cyber42.de",
       "maintainer": true
     }],
